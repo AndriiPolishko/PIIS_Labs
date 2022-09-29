@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -152,7 +152,6 @@ def breadthFirstSearch(problem: SearchProblem):
             break
     route.reverse()
     return route
-
     #util.raiseNotDefined()
 
 
@@ -174,21 +173,68 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
     priorityQueue = util.PriorityQueue()
-    visitedPositions = {}  # map in which key is a position and value is an array of pa
 
     startPosition = problem.getStartState()
-    start = [startPosition, (), 0]  # 0 - position, 1 - parent node, 2 - g(distance between root and element)
 
-    priorityQueue.push(start, heuristic)
+    h = heuristic(problem.getStartState(), problem)
+
+    start = [startPosition, (), 0, h, 'NONE']  # 0 - position, 1 - parent node, 2 - g(distance between root and element)
+                                               # 3 - f, 4 - direction
+
+    visitedPositions = {startPosition: start}  # map in which key is a position
+                           # and value is an array consisting of ancestor and f value
+
+    priorityQueue.push(startPosition, h)
+    route = []  # array of directions
+
+    q = visitedPositions.get(startPosition)
 
     while not priorityQueue.isEmpty():
         q = priorityQueue.pop()
-        qSuccessors = problem.getSuccessors(q[0])
+
+        if problem.isGoalState(q):
+            break
+
+        qData = visitedPositions.get(q)
+        qAncestor = qData[1]
+
+        qSuccessors = problem.getSuccessors(q)
         for successor in qSuccessors:
             successorConvertedIntoList = list(successor)
-            g = q[2] + successorConvertedIntoList[2]
-            f = g + heuristic
-            if
+            position = successorConvertedIntoList[0]
+            direction = successorConvertedIntoList[1]
+
+            g = qData[2] + successorConvertedIntoList[2]
+            h = heuristic(position, problem)
+            f = g + h
+
+            node = [position, q, g, f, direction]
+
+            existingPosition = visitedPositions.get(position)
+            if existingPosition is not None:
+                existingF = existingPosition[3]
+
+                if existingF > f:
+                    print('true')
+                    visitedPositions[position] = node
+                    priorityQueue.update(position, f)
+            else:
+                visitedPositions[position] = node
+                priorityQueue.push(position, f)
+
+    move = visitedPositions.get(q)
+    while True:
+        if move[4] == "NONE":
+            # print(route)
+            # print("done")
+
+            break
+        route.append(move[4])
+        # print(move)
+        move = visitedPositions.pop(move[1])
+    route.reverse()
+
+    return route
     #util.raiseNotDefined()
 
 # Abbreviations

@@ -65,7 +65,7 @@ class NegaAgent:
 
         bestMove = None
         for legalMove in self.board.legal_moves:
-            score = -(self.negaScout(depth - 1, -whoToMove, -alpha + 1, -alpha)[0])
+            score = -(self.negaScout(depth - 1, -whoToMove, -beta, -alpha)[0])
             #  NegaScout: re-iterate
             if score > alpha and score < beta and depth > 1:
                 score2 = -(self.negaScout(depth - 1, -whoToMove, -beta, -score))[0]
@@ -74,6 +74,7 @@ class NegaAgent:
             if score == 0:
                 score = random.random()
             if score > alpha:
+
                 alpha = score
                 bestMove = legalMove
             #  NegaScout: cut-off obsolete nodes
@@ -109,7 +110,7 @@ board = chess.Board()
 negaAgent = NegaAgent(board)
 depth, whoToMove = 5, -1
 
-algoType = input("Input 1 for negaMax, 2 for negaScout and 3 for PVC: ")
+algoType = int(input("Input 1 for negaMax, 2 for negaScout and 3 for PVC: "))
 while not board.is_checkmate():
 
     print("Game state:\n")
@@ -117,6 +118,7 @@ while not board.is_checkmate():
     move = input("Input your move: ")
     board.push_san(move)
     if algoType == 2:
+        print("hi")
         negaMove = negaAgent.negaScout(depth, whoToMove, -9999, 9999)[1]
     elif algoType == 3:
         negaMove = negaAgent.PVC(depth, whoToMove, -9999, 9999)[1]
